@@ -14,10 +14,5 @@ namespace Dijkstra
             To = to;
             Cost = cost;
         }
-        
-        public void Print()
-        {
-            GD.Print($"{From.Name} => {To.Name}");
-        }
     }
 }

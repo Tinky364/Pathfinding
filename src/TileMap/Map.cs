@@ -11,6 +11,8 @@ namespace TileMap
         public int XSize { get; }
         public int YSize { get; }
 
+        public Map() { }
+
         public Map(int xSize, int ySize)
         {
             XSize = xSize;
@@ -20,10 +22,22 @@ namespace TileMap
             _edges = new Dictionary<string, List<Edge<Tile>>>();
             InitializeEdges(XSize, YSize);
         }
-        
-        public Tile GetTile(int x, int y) => _map[Tile.ToName(x, y)];
 
-        public Tile GetTile(string name) => _map[name];
+        public Tile GetTile(int x, int y)
+        {
+            if (x >= XSize || y >= YSize || x < 0 || y < 0)
+            {
+                GD.PushError($"Trying to reach tile({x},{y}) does not exist.");
+            }
+            return _map[Tile.ToName(x, y)];
+        }
+
+        public Tile GetTile(string name)
+        {
+            if (!_map.TryGetValue(name, out Tile tile)) 
+                GD.PushError("Trying to reach tile does not exist.");
+            return tile;
+        }
         
         public IEnumerable<Edge<Tile>> GetEdges(PointRecord<Tile> pointRecord)
         {
@@ -31,6 +45,7 @@ namespace TileMap
             {
                 if (pair.Key == pointRecord.Point.Name) return pair.Value;
             }
+            GD.PushError("Trying to reach tile's edges does not exist.");
             return null;
         }
         

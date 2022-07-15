@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Dijkstra;
+using Godot;
 
 namespace TileMap
 {
-    public class Tile : IPoint
+    public class Tile : Reference, IPoint
     {
         public int X { get; }
         public int Y { get; }
