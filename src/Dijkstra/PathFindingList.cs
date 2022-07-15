@@ -1,51 +1,58 @@
 ﻿using System.Collections.Generic;
+using Advanced.Algorithms;
+using Advanced.Algorithms.DataStructures;
 using Godot;
 
 namespace Dijkstra
 {
-    public class PathFindingList : Reference
+    public class PathFindingList<T> : Reference where T : IPoint
     {
-        private readonly List<PointRecord> _list;
+        private readonly FibonacciHeap<PointRecord<T>> _heap;
 
-        public int Count => _list.Count;
+        public int Count => _heap.Count;
+
+        public IEnumerable<PointRecord<T>> All => _heap;
 
         public PathFindingList()
         {
-            _list = new List<PointRecord>();
+            _heap = new FibonacciHeap<PointRecord<T>>(SortDirection.Ascending);
         }
         
-        public void Add(PointRecord pointRecord)
+        public void Add(PointRecord<T> pointRecord)
         {
-            _list.Add(pointRecord);
-            _list.Sort();
+            _heap.Insert(pointRecord);
         }
 
-        public void Remove(PointRecord pointRecord)
+        public void Remove(PointRecord<T> pointRecord)
         {
-            _list.Remove(pointRecord);
-            _list.Sort();
+            _heap.Extract();
         }
 
-        public PointRecord SmallestPointRecord() => _list[0];
+        public PointRecord<T> SmallestPointRecord() => _heap.Peek();
 
-        public IEnumerable<PointRecord> AllRecords() => _list;
-
-        public bool Contains(PointRecord pointRecord) => _list.Contains(pointRecord);
-
-        public bool Contains(object point)
+        public bool Contains(PointRecord<T> pointRecord)
         {
-            foreach (PointRecord pointRecord in _list)
+            foreach (PointRecord<T> record in _heap)
             {
-                if (pointRecord.Point == point) return true;
+                if (ReferenceEquals(pointRecord, record)) return true;
             }
             return false;
         }
 
-        public PointRecord Find(object point)
+        public bool Contains(T point)
         {
-            foreach (PointRecord pointRecord in _list)
+            foreach (PointRecord<T> pointRecord in _heap)
             {
-                if (pointRecord.Point == point) return pointRecord;
+                if (pointRecord.Point.Equals(point)) return true;
+            }
+            return false;
+        }
+
+        public PointRecord<T> Find(T point)
+        {
+            foreach (PointRecord<T> pointRecord in _heap)
+            {
+                if (pointRecord.Point.Equals(point)) return pointRecord;
             }
             return null;
         }

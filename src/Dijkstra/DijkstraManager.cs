@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Godot;
+using TileMap;
 
 namespace Dijkstra
 {
@@ -8,45 +9,36 @@ namespace Dijkstra
         public override void _Ready()
         {
             base._Ready();
-            
-            Dots a = new Dots("A");
-            Dots b = new Dots("B");
-            Dots c = new Dots("C");
-            Dots d = new Dots("D");
-            Dots e = new Dots("E");
-            Dots f = new Dots("F");
-            Graph graph = new Graph(
-                new Edge(a, b, 2), new Edge(b, c, 1), new Edge(c, d, 1), new Edge(d, e, 1),
-                new Edge(e, f, 1), new Edge(a, c, 1), new Edge(c, f, 1)
-            );
 
-            List<Edge> path = FindPath(graph, a, f);
-            foreach (Edge edge in path) edge.Print();
+            Map map = new Map(10, 10);
+            List<Edge<Tile>> path = FindPath(map, map.GetTile(0,0), map.GetTile(3,6));
+            
+            foreach (Edge<Tile> edge in path) edge.Print();
         }
 
-        public List<Edge> FindPath(Graph graph, object startPoint, object goalPoint)
+        public List<Edge<T>> FindPath<T>(IGraph<T> graph, T startPoint, T goalPoint) where T : IPoint
         {
-            PointRecord startPointRecord = new PointRecord(startPoint);
+            PointRecord<T> startPointRecord = new PointRecord<T>(startPoint);
 
-            PathFindingList openList = new PathFindingList();
+            PathFindingList<T> openList = new PathFindingList<T>();
             openList.Add(startPointRecord);
-            PathFindingList closedList = new PathFindingList();
+            PathFindingList<T> closedList = new PathFindingList<T>();
 
-            PointRecord currentPointRecord = null;
+            PointRecord<T> currentPointRecord = openList.SmallestPointRecord();
             while (openList.Count > 0)
             {
                 currentPointRecord = openList.SmallestPointRecord();
 
-                if (currentPointRecord.Point == goalPoint) break;
+                if (currentPointRecord.Point.Equals(goalPoint)) break;
 
-                IEnumerable<Edge> edges = graph.GetEdges(currentPointRecord);
+                IEnumerable<Edge<T>> edges = graph.GetEdges(currentPointRecord);
 
-                foreach (Edge edge in edges)
+                foreach (Edge<T> edge in edges)
                 {
-                    object endPoint = edge.To;
+                    T endPoint = edge.To;
                     int endPointCost = currentPointRecord.CostSoFar + edge.Cost;
 
-                    PointRecord endPointRecord;
+                    PointRecord<T> endPointRecord;
                     if (closedList.Contains(endPoint)) // closed point
                     {
                         continue;
@@ -59,7 +51,7 @@ namespace Dijkstra
                     }
                     else // unvisited point
                     {
-                        endPointRecord = new PointRecord(endPoint); 
+                        endPointRecord = new PointRecord<T>(endPoint); 
                     }
 
                     endPointRecord.CostSoFar = endPointCost;
@@ -72,13 +64,13 @@ namespace Dijkstra
                 closedList.Add(currentPointRecord);
             }
             
-            if (currentPointRecord?.Point != goalPoint) return null;
+            if (!currentPointRecord.Point.Equals(goalPoint)) return null;
             
-            List<Edge> path = new List<Edge>();
-            while (currentPointRecord?.Point != startPoint)
+            List<Edge<T>> path = new List<Edge<T>>();
+            while (!currentPointRecord.Point.Equals(startPoint))
             {
-                path.Add(currentPointRecord?.Edge);
-                currentPointRecord = closedList.Find(currentPointRecord?.Edge.From);
+                path.Add(currentPointRecord.Edge);
+                currentPointRecord = closedList.Find(currentPointRecord.Edge.From);
             }
             path.Reverse();
             return path;

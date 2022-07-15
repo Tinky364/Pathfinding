@@ -2,22 +2,22 @@
 
 namespace Dijkstra
 {
-    public class Edge : Reference
+    public class Edge<T> : Reference where T : IPoint
     {
-        public object From { get; }
-        public object To { get; }
+        public T From { get; }
+        public T To { get; }
         public int Cost { get; }
 
-        public Edge(object from, object to, int cost)
+        public Edge(T from, T to, int cost)
         {
             From = from;
             To = to;
             Cost = cost;
         }
-
+        
         public void Print()
         {
-            GD.Print($"{(From as Dots)?.Name} => {(To as Dots)?.Name}");
+            GD.Print($"{From.Name} => {To.Name}");
         }
     }
 }

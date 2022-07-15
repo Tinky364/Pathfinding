@@ -3,13 +3,13 @@ using Godot;
 
 namespace Dijkstra
 {
-    public class PointRecord : Reference, IComparable
+    public class PointRecord<T> : Reference, IComparable where T : IPoint
     {
-        public object Point { get; }
-        public Edge Edge { get; set; }
+        public T Point { get; }
+        public Edge<T> Edge { get; set; }
         public int CostSoFar { get; set; }
 
-        public PointRecord(object point, Edge edge = null, int costSoFar = 0)
+        public PointRecord(T point, Edge<T> edge = null, int costSoFar = 0)
         {
             Point = point;
             Edge = edge;
@@ -21,7 +21,7 @@ namespace Dijkstra
             switch (obj)
             {
                 case null: return 1;
-                case PointRecord otherRecord: return CostSoFar.CompareTo(otherRecord.CostSoFar);
+                case PointRecord<T> otherRecord: return CostSoFar.CompareTo(otherRecord.CostSoFar);
                 default: throw new ArgumentException("Object is not a Record");
             }
         }
