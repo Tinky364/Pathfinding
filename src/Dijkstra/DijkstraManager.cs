@@ -11,12 +11,16 @@ namespace Dijkstra
             base._Ready();
 
             Map map = new Map(10, 10);
-            List<Edge<Tile>> path = FindPath(map, map.GetTile(0,0), map.GetTile(3,6));
-            
-            foreach (Edge<Tile> edge in path) edge.Print();
+            List<Edge<Tile>> path1 = FindPath(map, map.GetTile(0,0), map.GetTile(3,6));
+            foreach (Edge<Tile> edge in path1) edge.Print();
+            List<Edge<Tile>> path2 = FindPath(map, map.GetTile(3,6), map.GetTile(0,0));
+            foreach (Edge<Tile> edge in path2) edge.Print();
+            List<Edge<Tile>> path3 = FindPath(map, map.GetTile(9,4), map.GetTile(4,8));
+            foreach (Edge<Tile> edge in path3) edge.Print();
         }
 
-        public List<Edge<T>> FindPath<T>(IGraph<T> graph, T startPoint, T goalPoint) where T : IPoint
+        public static List<Edge<T>> FindPath<T>(IGraph<T> graph, T startPoint, T goalPoint)
+            where T : IPoint
         {
             PointRecord<T> startPointRecord = new PointRecord<T>(startPoint);
 
@@ -60,7 +64,7 @@ namespace Dijkstra
                     if (!openList.Contains(endPoint)) openList.Add(endPointRecord);
                 }
                 
-                openList.Remove(currentPointRecord);
+                openList.RemoveSmallestPointRecord();
                 closedList.Add(currentPointRecord);
             }
             

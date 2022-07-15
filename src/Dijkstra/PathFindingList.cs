@@ -23,7 +23,7 @@ namespace Dijkstra
             _heap.Insert(pointRecord);
         }
 
-        public void Remove(PointRecord<T> pointRecord)
+        public void RemoveSmallestPointRecord()
         {
             _heap.Extract();
         }

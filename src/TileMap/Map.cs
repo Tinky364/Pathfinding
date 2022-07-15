@@ -8,13 +8,17 @@ namespace TileMap
     {
         private readonly Dictionary<string, Tile> _map;
         private readonly Dictionary<string, List<Edge<Tile>>> _edges;
+        public int XSize { get; }
+        public int YSize { get; }
 
         public Map(int xSize, int ySize)
         {
+            XSize = xSize;
+            YSize = ySize;
             _map = new Dictionary<string, Tile>();
-            InitializeMap(xSize, ySize);
+            InitializeMap(XSize, YSize);
             _edges = new Dictionary<string, List<Edge<Tile>>>();
-            InitializeEdges(xSize, ySize);
+            InitializeEdges(XSize, YSize);
         }
         
         public Tile GetTile(int x, int y) => _map[Tile.ToName(x, y)];
