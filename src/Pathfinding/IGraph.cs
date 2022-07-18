@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace Dijkstra
+namespace Pathfinding
 {
     public interface IGraph<T> where T : IPoint
     {
-        IEnumerable<Edge<T>> GetEdges(PointRecord<T> pointRecord);
+        List<Edge<T>> GetEdges(PointRecord<T> pointRecord);
     }
 }
