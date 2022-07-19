@@ -1,9 +1,9 @@
 ﻿using System;
-using Godot;
+using Object = Godot.Object;
 
 namespace Pathfinding
 {
-    public class PointRecord<T> : Reference, IComparable where T : IPoint
+    public class PointRecord<T> : Object, IComparable where T : IPoint
     {
         public Pathfinder.Type CurType { get; }
         public T Point { get; }

@@ -11,7 +11,7 @@ namespace Pathfinding
         public List<Edge<T>> AStar<T>(IGraph<T> graph, T startPoint, T goalPoint) where T : IPoint
         {
             PointRecord<T> startPointRecord = new PointRecord<T>(
-                startPoint, startPoint.EstimateHeuristic(goalPoint)
+                startPoint, startPoint.EstimateTotalCost(goalPoint)
             );
 
             PathFindingList<T> openList = new PathFindingList<T>(startPointRecord);
@@ -24,10 +24,12 @@ namespace Pathfinding
 
                 if (currentPointRecord.Point.Equals(goalPoint)) break;
 
-                List<Edge<T>> edges = graph.GetEdges(currentPointRecord);
-                float endPointHeuristic = 0;
-                foreach (Edge<T> edge in edges)
+                List<Edge<T>>.Enumerator edges = graph.GetEdges(currentPointRecord);
+                float endPointEstimatedTotalCost = 0;
+                while (edges.MoveNext())
                 {
+                    Edge<T> edge = edges.Current;
+                    if (edge == null) continue;
                     T endPoint = edge.To;
                     float endPointCostSoFar = currentPointRecord.CostSoFar + edge.Cost;
 
@@ -37,26 +39,26 @@ namespace Pathfinding
                         
                         closedList.Remove(endPointRecord);
 
-                        endPointHeuristic =
+                        endPointEstimatedTotalCost =
                             endPointRecord.EstimatedTotalCost - endPointRecord.CostSoFar;
                     }
                     else if (openList.Find(endPoint, out endPointRecord))
                     {
                         if (endPointRecord.CostSoFar <= endPointCostSoFar) continue;
 
-                        endPointHeuristic =
+                        endPointEstimatedTotalCost =
                             endPointRecord.EstimatedTotalCost - endPointRecord.CostSoFar;
                     }
                     else
                     {
                         endPointRecord = new PointRecord<T>(
-                            endPoint, endPoint.EstimateHeuristic(goalPoint)
+                            endPoint, endPoint.EstimateTotalCost(goalPoint)
                         );
                     }
 
                     endPointRecord.CostSoFar = endPointCostSoFar;
                     endPointRecord.Edge = edge;
-                    endPointRecord.EstimatedTotalCost = endPointCostSoFar + endPointHeuristic;
+                    endPointRecord.EstimatedTotalCost = endPointCostSoFar + endPointEstimatedTotalCost;
                     
                     if (!openList.Contains(endPoint)) openList.Push(endPointRecord);
                 }
@@ -74,6 +76,10 @@ namespace Pathfinding
                 currentPointRecord = closedList.Find(currentPointRecord.Edge.From);
             }
             path.Reverse();
+
+            openList.Free();
+            closedList.Free();
+            
             return path;
         }
 
@@ -91,10 +97,12 @@ namespace Pathfinding
 
                 if (currentPointRecord.Point.Equals(goalPoint)) break;
 
-                List<Edge<T>> edges = graph.GetEdges(currentPointRecord);
+                List<Edge<T>>.Enumerator edges = graph.GetEdges(currentPointRecord);
 
-                foreach (Edge<T> edge in edges)
+                while (edges.MoveNext())
                 {
+                    Edge<T> edge = edges.Current;
+                    if (edge == null) continue;
                     T endPoint = edge.To;
                     float endPointCostSoFar = currentPointRecord.CostSoFar + edge.Cost;
 
@@ -131,20 +139,21 @@ namespace Pathfinding
                 currentPointRecord = closedList.Find(currentPointRecord.Edge.From);
             }
             path.Reverse();
+
+            openList.Free();
+            closedList.Free();
+            
             return path;
         }
 
         public void PrintPath<T>(List<Edge<T>> path) where T : IPoint
         {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < path.Count; i++)
-            {
-                sb.Append(
-                    i == 0
-                        ? $"Path: {path[i].From.Name} -> {path[i].To.Name}"
-                        : $" -> {path[i].To.Name}"
-                );
-            }
+            StringBuilder sb = new StringBuilder(
+                $"Path: Start = {path[0].From.Name}, Goal = {path[path.Count - 1].To.Name} \n" +
+                $"{path[0].From.Name} -> {path[0].To.Name}"
+            );
+            for (int i = 1; i < path.Count; i++) sb.Append($" -> {path[i].To.Name}");
+            sb.Append("\n------------------------");
             GD.Print(sb.ToString());
         }
     }

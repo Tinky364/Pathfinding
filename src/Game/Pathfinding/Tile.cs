@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Godot;
 
 namespace Pathfinding
@@ -11,7 +10,7 @@ namespace Pathfinding
         public int Y { get; }
         public int Cost { get; }
 
-        public float EstimateHeuristic<T>(T goalPoint) where T : IPoint
+        public float EstimateTotalCost<T>(T goalPoint) where T : IPoint
         {
             return goalPoint is Tile goalTile ? Distance(X, Y, goalTile.X, goalTile.Y) : 0;
         }

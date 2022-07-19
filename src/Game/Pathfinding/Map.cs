@@ -36,20 +36,22 @@ namespace Game.Pathfinding
         
         public Tile GetTile(int x, int y) => GetTile(Tile.ToName(x, y));
 
-        public List<Edge<Tile>> GetEdges(PointRecord<Tile> pointRecord)
+        public List<Edge<Tile>>.Enumerator GetEdges(PointRecord<Tile> pointRecord)
         {
             if (!_edges.TryGetValue(pointRecord.Point.Name, out List<Edge<Tile>> list))
                 GD.PushError($"Edges of the tile {pointRecord.Point.Name} does not exist.");
-            return list;
+            return list?.GetEnumerator() ?? new List<Edge<Tile>>.Enumerator();
         }
 
         private void InitializeMap(int xSize, int ySize)
         {
+            RandomNumberGenerator rng = new RandomNumberGenerator();
+            rng.Randomize();
             for (int x = 0; x < xSize; x++)
             {
                 for (int y = 0; y < ySize; y++)
                 {
-                    Tile tile = new Tile(x, y);
+                    Tile tile = new Tile(x, y, rng.RandiRange(1, 4));
                     _map.Add(tile.Name, tile);
                 }
             }

@@ -11,6 +11,7 @@ namespace Game
         private Map _map;
         private TileMap _tileMap;
         private Timer _timer;
+        private RandomNumberGenerator _rng;
         
         public override void _Ready()
         {
@@ -20,18 +21,29 @@ namespace Game
             _tileMap = GetNode<TileMap>("TileMap");
             _timer = new Timer();
             AddChild(_timer);
-            _timer.WaitTime = 2f;
+            _timer.WaitTime = 10f;
+            _rng = new RandomNumberGenerator();
+            _rng.Randomize();
 
             Path();
         }
 
         private async Task Path()
         {
-            List<Edge<Tile>> path1 = AStar(_map, _map.GetTile(0, 0), _map.GetTile(8, 4));
-            PrintPath(path1);
-
             _timer.Start();
             await ToSignal(_timer, "timeout");
+
+            var stopWatch = new System.Diagnostics.Stopwatch();
+            stopWatch.Start();
+
+            List<Edge<Tile>> path1 = AStar(
+                _map, _map.GetTile(_rng.RandiRange(0, 19), _rng.RandiRange(0, 19)),
+                _map.GetTile(_rng.RandiRange(0, 19), _rng.RandiRange(0, 19))
+            );
+            
+            stopWatch.Stop();
+            GD.Print($"Total Execution Time: {stopWatch.ElapsedMilliseconds / 1000f}");
+            PrintPath(path1);
 
             Path();
         }

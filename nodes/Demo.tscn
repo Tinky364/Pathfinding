@@ -12,6 +12,8 @@ script = ExtResource( 1 )
 
 [node name="Map" type="Node" parent="MapManager"]
 script = ExtResource( 2 )
+XSize = 20
+YSize = 20
 
 [node name="TileMap" type="TileMap" parent="MapManager"]
 mode = 1

@@ -3,7 +3,7 @@ using Godot;
 
 namespace Pathfinding
 {
-    public class PathFindingList<T> : Reference where T : IPoint
+    public class PathFindingList<T> : Object where T : IPoint
     {
         private PointRecord<T> _head;
         
@@ -60,8 +60,7 @@ namespace Pathfinding
                         break;
                     }
                     
-                    while (iterator.Next != null &&
-                           iterator.Next.CostSoFar < pointRecord.CostSoFar)
+                    while (iterator.Next != null && iterator.Next.CostSoFar < pointRecord.CostSoFar)
                     {
                         iterator = iterator.Next;
                     }
@@ -196,18 +195,44 @@ namespace Pathfinding
                 iterator = iterator.Next;
             }
         }
-
-        public void Print()
+        
+        public override string ToString()
         {
             PointRecord<T> iterator = _head;
-            StringBuilder sb = new StringBuilder($"{iterator.Point.Name}");
+            StringBuilder sb = new StringBuilder(
+                $"({iterator.Point.Name} = {iterator.EstimatedTotalCost})"
+            );
             iterator = iterator.Next;
             while (iterator != null)
             {
-                sb.Append($" - {iterator.Point.Name}");
+                sb.Append($" - ({iterator.Point.Name} = {iterator.EstimatedTotalCost})");
                 iterator = iterator.Next;
             }
-            GD.Print(sb.ToString());
+            return sb.ToString();
+        }
+
+        public void Clear()
+        {
+            FreeAllPointRecords();
+            Count = 0;
+            _head = null;
+        }
+
+        public new void Free()
+        {
+            FreeAllPointRecords();
+            base.Free();
+        }
+
+        private void FreeAllPointRecords()
+        {
+            PointRecord<T> iterator = _head;
+            while (iterator != null)
+            {
+                PointRecord<T> temp = iterator;
+                iterator = iterator.Next;
+                temp.Free();
+            }
         }
     }
 }
