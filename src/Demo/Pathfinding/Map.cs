@@ -2,14 +2,14 @@
 using Pathfinding;
 using Godot;
 
-namespace Game.Pathfinding
+namespace Demo.Pathfinding
 {
     public class Map : Node, IGraph<Tile>
     {
         [Export(PropertyHint.Range, "0,100,or_greater")]
-        public int XSize { get; private set; } = 10;
+        public int XSize { get; private set; } = 20;
         [Export(PropertyHint.Range, "0,100,or_greater")]
-        public int YSize { get; private set; } = 10;
+        public int YSize { get; private set; } = 20;
 
         private readonly Dictionary<string, Tile> _map;
         private readonly Dictionary<string, List<Edge<Tile>>> _edges;

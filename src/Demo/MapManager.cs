@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Game.Pathfinding;
+using Demo.Pathfinding;
 using Godot;
 using Pathfinding;
 
-namespace Game
+namespace Demo
 {
     public class MapManager : Pathfinder
     {
