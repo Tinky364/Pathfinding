@@ -13,6 +13,10 @@ config_version=4
 config/name="Pathfinding"
 run/main_scene="res://nodes/Demo1.tscn"
 
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/Pathfinding/plugin.cfg" )
+
 [physics]
 
 common/enable_pause_aware_picking=true
