@@ -6,73 +6,81 @@ namespace Demo.Pathfinding
 {
     public class Map : Node, IGraph<Tile>
     {
-        [Export(PropertyHint.Range, "0,100,or_greater")]
-        public int XSize { get; private set; } = 20;
-        [Export(PropertyHint.Range, "0,100,or_greater")]
-        public int YSize { get; private set; } = 20;
+        private Dictionary<string, Tile> _tiles;
+        private Dictionary<string, List<Edge<Tile>>> _edges;
 
-        private readonly Dictionary<string, Tile> _map;
-        private readonly Dictionary<string, List<Edge<Tile>>> _edges;
-
-        public Map()
+        public void Initialize(Coordinate size)
         {
-            _map = new Dictionary<string, Tile>();
-            _edges = new Dictionary<string, List<Edge<Tile>>>();
+            InitializeTiles(size);
+            InitializeEdges();
         }
         
-        public override void _EnterTree()
+        public void Initialize(Dictionary<Coordinate, int> mapData)
         {
-            base._EnterTree();
-            InitializeMap(XSize, YSize);
-            InitializeEdges(XSize, YSize);
+            InitializeTiles(mapData);
+            InitializeEdges();
         }
-
+        
         public Tile GetTile(string name)
         {
-            if (!_map.TryGetValue(name, out Tile tile)) 
+            if (!_tiles.TryGetValue(name, out Tile tile)) 
                 GD.PushError($"Tile {name} does not exist.");
             return tile;
         }
         
-        public Tile GetTile(int x, int y) => GetTile(Tile.ToName(x, y));
+        public Tile GetTile(Coordinate coor) => GetTile(Tile.ToName(coor));
+        
+        public bool TryGetTile(string name, out Tile tile) => _tiles.TryGetValue(name, out tile);
 
-        public List<Edge<Tile>>.Enumerator GetEdges(PointRecord<Tile> pointRecord)
+        public bool TryGetTile(Coordinate coor, out Tile tile) =>
+            TryGetTile(Tile.ToName(coor), out tile);
+
+        public Dictionary<string, Tile>.ValueCollection.Enumerator TileIterator() =>
+            _tiles.Values.GetEnumerator();
+
+        public List<Edge<Tile>>.Enumerator EdgeIterator(PointRecord<Tile> pointRecord)
         {
             if (!_edges.TryGetValue(pointRecord.Point.Name, out List<Edge<Tile>> list))
                 GD.PushError($"Edges of the tile {pointRecord.Point.Name} does not exist.");
             return list?.GetEnumerator() ?? new List<Edge<Tile>>.Enumerator();
         }
 
-        private void InitializeMap(int xSize, int ySize)
+        private void InitializeTiles(Coordinate size)
         {
+            _tiles = new Dictionary<string, Tile>();
             RandomNumberGenerator rng = new RandomNumberGenerator();
             rng.Randomize();
-            for (int x = 0; x < xSize; x++)
+            for (int x = 0; x < size.X; x++)
             {
-                for (int y = 0; y < ySize; y++)
+                for (int y = 0; y < size.Y; y++)
                 {
-                    Tile tile = new Tile(x, y, rng.RandiRange(1, 4));
-                    _map.Add(tile.Name, tile);
+                    Tile tile = new Tile(new Coordinate(x, y), rng.RandiRange(1, 3));
+                    _tiles.Add(tile.Name, tile);
                 }
             }
         }
-
-        private void InitializeEdges(int xSize, int ySize)
+        
+        private void InitializeTiles(Dictionary<Coordinate, int> mapData)
         {
-            foreach (Tile tile in _map.Values)
+            _tiles = new Dictionary<string, Tile>();
+            foreach (var pair in mapData)
             {
-                IEnumerable<string> neighborsNames = Tile.NeighborsNames(tile, xSize, ySize);
+                Tile tile = new Tile(pair.Key, pair.Value);
+                _tiles.Add(tile.Name, tile);
+            }
+        }
 
+        private void InitializeEdges()
+        {
+            _edges = new Dictionary<string, List<Edge<Tile>>>();
+            foreach (Tile tile in _tiles.Values)
+            {
                 List<Edge<Tile>> edges = new List<Edge<Tile>>();
-                foreach (string name in neighborsNames)
+                IEnumerable<Coordinate> possibleNeighbors = Tile.PossibleNeighbors(tile);
+                foreach (Coordinate coor in possibleNeighbors)
                 {
-                    Tile neighbor = GetTile(name);
-                    edges.Add(
-                        new Edge<Tile>(
-                            tile, neighbor,
-                            Tile.CostOfMove(tile, neighbor)
-                        )
-                    );
+                    if (TryGetTile(coor, out Tile neighbor))
+                        edges.Add(new Edge<Tile>(tile, neighbor, Tile.CostOfMove(tile, neighbor)));
                 }
                 _edges.Add(tile.Name, edges);
             }

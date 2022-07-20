@@ -5,13 +5,12 @@ namespace Pathfinding
 {
     public class PathFindingList<T> : Object where T : IPoint
     {
-        private PointRecord<T> _head;
-        
-        public Pathfinder.Type CurType { get; private set; }
-        
+        public PointRecord<T> SmallestPointRecord => _head;
         public bool IsEmpty => _head == null;
-
         public int Count { get; private set; }
+
+        private PointRecord<T> _head;
+        private Pathfinder.Type _curType;
 
         public PathFindingList() { }
         
@@ -26,11 +25,11 @@ namespace Pathfinding
             if (_head == null)
             {
                 _head = pointRecord;
-                CurType = _head.CurType;
+                _curType = _head.CurType;
                 return;
             }
             PointRecord<T> iterator = _head;
-            switch (CurType)
+            switch (_curType)
             {
                 case Pathfinder.Type.AStar:
                 {
@@ -61,9 +60,7 @@ namespace Pathfinding
                     }
                     
                     while (iterator.Next != null && iterator.Next.CostSoFar < pointRecord.CostSoFar)
-                    {
                         iterator = iterator.Next;
-                    }
 
                     pointRecord.Next = iterator.Next;
                     iterator.Next = pointRecord;
@@ -74,13 +71,13 @@ namespace Pathfinding
 
         public void RemoveSmallestPointRecord()
         {
+            if (IsEmpty) return;
+            
             Count--;
             PointRecord<T> temp = _head;
             _head = _head.Next;
             temp.Next = null;
         }
-
-        public PointRecord<T> SmallestPointRecord() => _head;
 
         public bool Contains(PointRecord<T> pointRecord)
         {
@@ -198,6 +195,8 @@ namespace Pathfinding
         
         public override string ToString()
         {
+            if (IsEmpty) return "PathfinderList is empty.";
+            
             PointRecord<T> iterator = _head;
             StringBuilder sb = new StringBuilder(
                 $"({iterator.Point.Name} = {iterator.EstimatedTotalCost})"
@@ -226,6 +225,8 @@ namespace Pathfinding
 
         private void FreeAllPointRecords()
         {
+            if (IsEmpty) return;
+            
             PointRecord<T> iterator = _head;
             while (iterator != null)
             {

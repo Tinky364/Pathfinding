@@ -1,80 +1,61 @@
 ﻿using System.Collections.Generic;
 using Godot;
+using Pathfinding;
 
-namespace Pathfinding
+namespace Demo.Pathfinding
 {
     public class Tile : Reference, IPoint
     {
         public string Name { get; }
-        public int X { get; }
-        public int Y { get; }
         public int Cost { get; }
+        public Coordinate Coor;
 
-        public float EstimateTotalCost<T>(T goalPoint) where T : IPoint
+        public Tile(Coordinate coor, int cost = 1)
         {
-            return goalPoint is Tile goalTile ? Distance(X, Y, goalTile.X, goalTile.Y) : 0;
-        }
-
-        public Tile(int x, int y, int cost = 1)
-        {
-            X = x;
-            Y = y;
-            Name = ToName(x, y);
+            Coor = coor;
+            Name = ToName(coor);
             Cost = cost;
         }
 
-        public static string ToName(int x, int y) => $"{x},{y}";
+        public float EstimateTotalCost<T>(T goalPoint) where T : IPoint =>
+            goalPoint is Tile goalTile ? Distance(Coor, goalTile.Coor) : 0;
 
-        public static (int, int) ToCoordinate(string name)
+        public override string ToString() => $"Tile({Name})";
+
+        public static string ToName(Coordinate coor) => $"{coor.X},{coor.Y}";
+
+        public static Coordinate ToCoordinate(string name)
         {
             string[] splitName = name.Split(',');
-            return (int.Parse(splitName[0]), int.Parse(splitName[1]));
+            return new Coordinate(int.Parse(splitName[0]), int.Parse(splitName[1]));
         }
 
-        public static IEnumerable<string> NeighborsNames(int x, int y, int xSize, int ySize)
+        public static IEnumerable<Coordinate> PossibleNeighbors(Coordinate coor)
         {
-            if (x != xSize - 1)
+            for (int x = -1; x <= 1; x++)
             {
-                yield return ToName(x + 1, y);
-                if (y != ySize - 1) yield return ToName(x + 1, y + 1);
-            }
-            if (y != ySize - 1)
-            {
-                yield return ToName(x, y + 1);
-                if (x != 0) yield return ToName(x - 1, y + 1);
-            }
-            if (x != 0)
-            {
-                yield return ToName(x - 1, y);
-                if (y != 0) yield return ToName(x - 1, y - 1);
-            }
-            if (y != 0)
-            {
-                yield return ToName(x, y - 1);
-                if (x != xSize - 1) yield return ToName(x + 1, y - 1);
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (x == 0 && y == 0 ) continue;
+                    yield return new Coordinate(coor.X + x, coor.Y + y);
+                }
             }
         }
 
-        public static IEnumerable<string> NeighborsNames(Tile tile, int xSize, int ySize)
-        {
-            return NeighborsNames(tile.X, tile.Y, xSize, ySize);
-        }
+        public static IEnumerable<Coordinate> PossibleNeighbors(Tile tile) =>
+            PossibleNeighbors(tile.Coor);
 
-        public static float Distance(int x1, int y1, int x2, int y2)
-        {
-            return Mathf.Sqrt(Mathf.Pow(x1 - x2, 2) + Mathf.Pow(y1 - y2, 2));
-        }
+        public static float Distance(Coordinate a, Coordinate b) =>
+            Mathf.Sqrt(Mathf.Pow(a.X - b.X, 2) + Mathf.Pow(a.Y - b.Y, 2));
 
-        public static float Distance(Tile tile1, Tile tile2)
-        {
-            return Distance(tile1.X, tile1.Y, tile2.X, tile2.Y);
-        }
+        public static float Distance(Tile tile1, Tile tile2) => Distance(tile1.Coor, tile2.Coor);
 
         public static float CostOfMove(Tile from, Tile to)
         {
-            float distance = Distance(from, to);
-            float tileCost = to.Cost;
-            return distance * tileCost;
+            float distanceFactor = 0f;
+            if (Distance(from, to) > 1.1f)
+                distanceFactor = 0.5f;
+            return distanceFactor + to.Cost;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using Godot;
 
 namespace Pathfinding
@@ -8,7 +7,14 @@ namespace Pathfinding
     {
         public enum Type { AStar, Dijkstra }
 
-        public List<Edge<T>> AStar<T>(IGraph<T> graph, T startPoint, T goalPoint) where T : IPoint
+        public bool AStar<T>(out Path<T> path, IGraph<T> graph, T startPoint, T goalPoint)
+            where T : IPoint
+        {
+            path = AStar(graph, startPoint, goalPoint);
+            return path != null;
+        }
+
+        public Path<T> AStar<T>(IGraph<T> graph, T startPoint, T goalPoint) where T : IPoint
         {
             PointRecord<T> startPointRecord = new PointRecord<T>(
                 startPoint, startPoint.EstimateTotalCost(goalPoint)
@@ -20,15 +26,15 @@ namespace Pathfinding
             PointRecord<T> currentPointRecord = startPointRecord;
             while (openList.Count > 0)
             {
-                currentPointRecord = openList.SmallestPointRecord();
+                currentPointRecord = openList.SmallestPointRecord;
 
                 if (currentPointRecord.Point.Equals(goalPoint)) break;
 
-                List<Edge<T>>.Enumerator edges = graph.GetEdges(currentPointRecord);
                 float endPointEstimatedTotalCost = 0;
-                while (edges.MoveNext())
+                List<Edge<T>>.Enumerator edgesIterator = graph.EdgeIterator(currentPointRecord);
+                while (edgesIterator.MoveNext())
                 {
-                    Edge<T> edge = edges.Current;
+                    Edge<T> edge = edgesIterator.Current;
                     if (edge == null) continue;
                     T endPoint = edge.To;
                     float endPointCostSoFar = currentPointRecord.CostSoFar + edge.Cost;
@@ -69,7 +75,7 @@ namespace Pathfinding
 
             if (!currentPointRecord.Point.Equals(goalPoint)) return null;
 
-            List<Edge<T>> path = new List<Edge<T>>();
+            Path<T> path = new Path<T>();
             while (!currentPointRecord.Point.Equals(startPoint))
             {
                 path.Add(currentPointRecord.Edge);
@@ -82,8 +88,15 @@ namespace Pathfinding
             
             return path;
         }
+        
+        public bool Dijkstra<T>(out Path<T> path, IGraph<T> graph, T startPoint, T goalPoint)
+            where T : IPoint
+        {
+            path = Dijkstra(graph, startPoint, goalPoint);
+            return path != null;
+        }
 
-        public List<Edge<T>> Dijkstra<T>(IGraph<T> graph, T startPoint, T goalPoint) where T : IPoint
+        public Path<T> Dijkstra<T>(IGraph<T> graph, T startPoint, T goalPoint) where T : IPoint
         {
             PointRecord<T> startPointRecord = new PointRecord<T>(startPoint);
 
@@ -93,11 +106,11 @@ namespace Pathfinding
             PointRecord<T> currentPointRecord = startPointRecord;
             while (openList.Count > 0)
             {
-                currentPointRecord = openList.SmallestPointRecord();
+                currentPointRecord = openList.SmallestPointRecord;
 
                 if (currentPointRecord.Point.Equals(goalPoint)) break;
 
-                List<Edge<T>>.Enumerator edges = graph.GetEdges(currentPointRecord);
+                List<Edge<T>>.Enumerator edges = graph.EdgeIterator(currentPointRecord);
 
                 while (edges.MoveNext())
                 {
@@ -131,8 +144,8 @@ namespace Pathfinding
             }
             
             if (!currentPointRecord.Point.Equals(goalPoint)) return null;
-            
-            List<Edge<T>> path = new List<Edge<T>>();
+
+            Path<T> path = new Path<T>();
             while (!currentPointRecord.Point.Equals(startPoint))
             {
                 path.Add(currentPointRecord.Edge);
@@ -144,17 +157,6 @@ namespace Pathfinding
             closedList.Free();
             
             return path;
-        }
-
-        public void PrintPath<T>(List<Edge<T>> path) where T : IPoint
-        {
-            StringBuilder sb = new StringBuilder(
-                $"Path: Start = {path[0].From.Name}, Goal = {path[path.Count - 1].To.Name} \n" +
-                $"{path[0].From.Name} -> {path[0].To.Name}"
-            );
-            for (int i = 1; i < path.Count; i++) sb.Append($" -> {path[i].To.Name}");
-            sb.Append("\n------------------------");
-            GD.Print(sb.ToString());
         }
     }
 }
