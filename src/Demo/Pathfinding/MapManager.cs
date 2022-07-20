@@ -77,10 +77,7 @@ namespace Demo.Pathfinding
                 _lineDrawer.AddPoint(CoordinateToGlobal(path[i].To.Coor));
         }
 
-        public void ClearPath()
-        {
-            _lineDrawer.ClearPoints();
-        }
+        public void ClearPath() => _lineDrawer.ClearPoints();
 
         public void DrawAvailableTiles(List<Tile> tiles)
         {
@@ -88,10 +85,7 @@ namespace Demo.Pathfinding
             foreach (Tile tile in tiles) _tm.SetCell(tile.Coor, 0);
         }
 
-        public void ClearAvailableTiles()
-        {
-            _tm.Clear();
-        }
+        public void ClearAvailableTiles() => _tm.Clear();
 
         private void CreateMap(bool diagonalMove = false)
         {

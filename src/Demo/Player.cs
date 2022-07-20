@@ -31,37 +31,32 @@ namespace Demo
 
         private void OnMouseButtonLeftPressed(InputEventMouseButton eventMouseButton)
         {
-            if (_mapManager.Tile(eventMouseButton.GlobalPosition, out Tile tile))
+            if (!_mapManager.Tile(eventMouseButton.GlobalPosition, out Tile tile)) return;
+            
+            if (_selectedTile == null)
             {
-                if (_selectedTile == null)
+                _mapManager.ClearPath();
+                _selectedTile = tile;
+                GD.Print($"Start Tile: {tile}");
+                List<Tile> tiles = _mapManager.AvailableTiles(_selectedTile, 3);
+                _mapManager.DrawAvailableTiles(tiles);
+            }
+            else if (_selectedTile == tile)
+            {
+                _selectedTile = null;
+                GD.Print("Start Tile: Empty");
+            }
+            else
+            {
+                _mapManager.ClearAvailableTiles();
+                GD.Print($"Goal Tile: {tile}");
+                if (_mapManager.AStar(out Path<Tile> path, _selectedTile, tile))
                 {
-                    _mapManager.ClearPath();
-                    _selectedTile = tile;
-                    GD.Print($"Start Tile: {tile}");
-                    List<Tile> tiles = _mapManager.AvailableTiles(_selectedTile, 3);
-                    _mapManager.DrawAvailableTiles(tiles);
+                    _mapManager.DrawPath(path);
+                    GD.Print($"Path cost: {path.Cost}");
                 }
-                else if (_selectedTile == tile)
-                {
-                    _selectedTile = null;
-                    GD.Print("Start Tile: Empty");
-                }
-                else
-                {
-                    _mapManager.ClearAvailableTiles();
-                    if (_mapManager.AStar(out Path<Tile> path, _selectedTile, tile))
-                    {
-                        _mapManager.DrawPath(path);
-                        GD.Print($"Goal Tile: {tile}");
-                        GD.Print($"Path cost: {path.Cost}");
-                    }
-                    else
-                    {
-                        GD.Print($"Goal Tile: {tile}");
-                        GD.Print("No path!");
-                    }
-                    _selectedTile = null;
-                }
+                else GD.Print("No path!");
+                _selectedTile = null;
             }
         }
     }
