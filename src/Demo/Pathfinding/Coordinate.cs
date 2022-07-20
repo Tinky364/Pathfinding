@@ -27,9 +27,9 @@ namespace Demo.Pathfinding
         public static Coordinate operator -(Coordinate a, Coordinate b) =>
             new Coordinate(a.X - b.X, a.Y - b.Y);
 
-        public static Coordinate operator/(Coordinate a, int b) => new Coordinate(a.X / b, a.Y / b);
+        public static Coordinate operator /(Coordinate a, int b) => new Coordinate(a.X / b, a.Y / b);
 
-        public static Coordinate operator*(Coordinate a, int b) => new Coordinate(a.X * b, a.Y * b);
+        public static Coordinate operator *(Coordinate a, int b) => new Coordinate(a.X * b, a.Y * b);
 
         public static bool operator ==(Coordinate a, Coordinate b) => a.X == b.X && a.Y == b.Y;
 

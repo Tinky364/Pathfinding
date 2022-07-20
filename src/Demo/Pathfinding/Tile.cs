@@ -8,7 +8,7 @@ namespace Demo.Pathfinding
     {
         public string Name { get; }
         public int Cost { get; }
-        public Coordinate Coor;
+        public Coordinate Coor { get; }
 
         public Tile(Coordinate coor, int cost = 1)
         {
@@ -64,8 +64,7 @@ namespace Demo.Pathfinding
         public static float CostOfMove(Tile from, Tile to)
         {
             float distanceFactor = 0f;
-            if (Distance(from, to) > 1.1f)
-                distanceFactor = 0.5f;
+            if (Distance(from, to) > 1.1f) distanceFactor = 0.5f;
             return distanceFactor + to.Cost;
         }
     }

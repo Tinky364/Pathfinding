@@ -10,7 +10,7 @@ namespace Demo.Pathfinding
             Coordinate coor, int tileId, bool flipX = false, bool flipY = false,
             bool transpose = false, Vector2? autotileCoord = null)
         {
-            SetCell(coor.X, coor.Y, tileId, flipX, flipY, transpose);
+            SetCell(coor.X, coor.Y, tileId, flipX, flipY, transpose, autotileCoord);
         }
 
         public List<Coordinate> GetCellsById(int id)
