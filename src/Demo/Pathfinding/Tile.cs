@@ -30,7 +30,7 @@ namespace Demo.Pathfinding
             return new Coordinate(int.Parse(splitName[0]), int.Parse(splitName[1]));
         }
 
-        public static IEnumerable<Coordinate> PossibleNeighbors(Coordinate coor)
+        public static IEnumerable<Coordinate> Possible8Neighbors(Coordinate coor)
         {
             for (int x = -1; x <= 1; x++)
             {
@@ -41,9 +41,20 @@ namespace Demo.Pathfinding
                 }
             }
         }
+        
+        public static IEnumerable<Coordinate> Possible8Neighbors(Tile tile) =>
+            Possible8Neighbors(tile.Coor);
 
-        public static IEnumerable<Coordinate> PossibleNeighbors(Tile tile) =>
-            PossibleNeighbors(tile.Coor);
+        public static IEnumerable<Coordinate> Possible4Neighbors(Coordinate coor)
+        {
+            yield return new Coordinate(coor.X + 1, coor.Y);
+            yield return new Coordinate(coor.X, coor.Y + 1);
+            yield return new Coordinate(coor.X - 1, coor.Y);
+            yield return new Coordinate(coor.X, coor.Y - 1);
+        }
+        
+        public static IEnumerable<Coordinate> Possible4Neighbors(Tile tile) =>
+            Possible4Neighbors(tile.Coor);
 
         public static float Distance(Coordinate a, Coordinate b) =>
             Mathf.Sqrt(Mathf.Pow(a.X - b.X, 2) + Mathf.Pow(a.Y - b.Y, 2));

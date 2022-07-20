@@ -9,16 +9,16 @@ namespace Demo.Pathfinding
         private Dictionary<string, Tile> _tiles;
         private Dictionary<string, List<Edge<Tile>>> _edges;
 
-        public void Initialize(Coordinate size)
+        public void Initialize(Coordinate size, bool diagonalMove = false)
         {
             InitializeTiles(size);
-            InitializeEdges();
+            InitializeEdges(diagonalMove);
         }
         
-        public void Initialize(Dictionary<Coordinate, int> mapData)
+        public void Initialize(Dictionary<Coordinate, int> mapData, bool diagonalMove = false)
         {
             InitializeTiles(mapData);
-            InitializeEdges();
+            InitializeEdges(diagonalMove);
         }
         
         public Tile GetTile(string name)
@@ -70,13 +70,15 @@ namespace Demo.Pathfinding
             }
         }
 
-        private void InitializeEdges()
+        private void InitializeEdges(bool diagonalMove = false)
         {
             _edges = new Dictionary<string, List<Edge<Tile>>>();
             foreach (Tile tile in _tiles.Values)
             {
                 List<Edge<Tile>> edges = new List<Edge<Tile>>();
-                IEnumerable<Coordinate> possibleNeighbors = Tile.PossibleNeighbors(tile);
+                var possibleNeighbors = diagonalMove
+                    ? Tile.Possible8Neighbors(tile)
+                    : Tile.Possible4Neighbors(tile);
                 foreach (Coordinate coor in possibleNeighbors)
                 {
                     if (TryGetTile(coor, out Tile neighbor))

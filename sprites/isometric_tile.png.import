@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Tile.png-55619b3d08603de4c33b6bb0a26f882d.stex"
+path="res://.import/isometric_tile.png-a2b46e352acf7958d0a2f07efd27c2c0.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/Tile.png"
-dest_files=[ "res://.import/Tile.png-55619b3d08603de4c33b6bb0a26f882d.stex" ]
+source_file="res://sprites/isometric_tile.png"
+dest_files=[ "res://.import/isometric_tile.png-a2b46e352acf7958d0a2f07efd27c2c0.stex" ]
 
 [params]
 
@@ -19,12 +19,12 @@ compress/lossy_quality=0.7
 compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=2
-flags/repeat=1
+flags/repeat=0
 flags/filter=false
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2
-process/fix_alpha_border=true
+process/fix_alpha_border=false
 process/premult_alpha=false
 process/HDR_as_SRGB=false
 process/invert_color=false
