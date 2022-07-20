@@ -16,7 +16,8 @@ namespace Demo.Pathfinding
         private int _ySize = 15;
 
         private Map _map;
-        private TileMapExt _tileMap;
+        private TileMapExt _baseTm;
+        private TileMapExt _tm;
         private Line2D _lineDrawer;
         private readonly Coordinate _size;
 
@@ -30,24 +31,25 @@ namespace Demo.Pathfinding
             base._Ready();
 
             _map = GetNode<Map>("Map");
-            _tileMap = GetNode<TileMapExt>("TileMap");
-            _lineDrawer = GetNode<Line2D>("LineDrawer");
+            _baseTm = GetNode<TileMapExt>("BaseTm");
+            _tm = GetNode<TileMapExt>("BaseTm/Tm");
+            _lineDrawer = GetNode<Line2D>("BaseTm/LineDrawer");
 
             CreateMap(_diagonalMove);
         }
 
         public Coordinate GlobalToCoordinate(Vector2 globalPosition) =>
-            new Coordinate(_tileMap.WorldToMap(_tileMap.ToLocal(globalPosition)));
+            new Coordinate(_baseTm.WorldToMap(_baseTm.ToLocal(globalPosition)));
 
         public Vector2 CoordinateToGlobal(Coordinate coordinate)
         {
-            Vector2 pos = _tileMap.ToGlobal(_tileMap.MapToWorld(coordinate.ToVector));
-            switch (_tileMap.Mode)
+            Vector2 pos = _baseTm.ToGlobal(_baseTm.MapToWorld(coordinate.ToVector));
+            switch (_baseTm.Mode)
             {
                 case TileMap.ModeEnum.Square: 
-                    return new Vector2(pos + _tileMap.CellSize / 2f);
+                    return new Vector2(pos + _baseTm.CellSize / 2f);
                 case TileMap.ModeEnum.Isometric:
-                    return new Vector2(pos.x, pos.y + _tileMap.CellSize.y / 2f);
+                    return new Vector2(pos.x, pos.y + _baseTm.CellSize.y / 2f);
                 case TileMap.ModeEnum.Custom:
                 default: return pos;
             }
@@ -62,12 +64,33 @@ namespace Demo.Pathfinding
         public bool AStar(out Path<Tile> path, Tile startTile, Tile goalTile) =>
             AStar(out path, _map, startTile, goalTile);
 
+        public List<Tile> AvailableTiles(Tile startTile, float maxCost)
+        {
+            return AvailableTs(_map, startTile, maxCost);
+        }
+
         public void DrawPath(Path<Tile> path)
         {
             _lineDrawer.ClearPoints();
             _lineDrawer.AddPoint(CoordinateToGlobal(path[0].From.Coor));
             for (int i = 0; i < path.Count; i++)
                 _lineDrawer.AddPoint(CoordinateToGlobal(path[i].To.Coor));
+        }
+
+        public void ClearPath()
+        {
+            _lineDrawer.ClearPoints();
+        }
+
+        public void DrawAvailableTiles(List<Tile> tiles)
+        {
+            _tm.Clear();
+            foreach (Tile tile in tiles) _tm.SetCell(tile.Coor, 0);
+        }
+
+        public void ClearAvailableTiles()
+        {
+            _tm.Clear();
         }
 
         private void CreateMap(bool diagonalMove = false)
@@ -86,9 +109,9 @@ namespace Demo.Pathfinding
         private void CreateMapFromEditor(bool diagonalMove = false)
         {
             Dictionary<Coordinate, int> mapData = new Dictionary<Coordinate, int>();
-            foreach (int id in _tileMap.GetTileIds())
+            foreach (int id in _baseTm.GetTileIds())
             {
-                List<Coordinate> coordinates = _tileMap.GetCellsById(id);
+                List<Coordinate> coordinates = _baseTm.GetCellsById(id);
                 foreach (Coordinate coordinate in coordinates) mapData.Add(coordinate, id);
             }
             _map.Initialize(mapData, diagonalMove);
@@ -97,13 +120,13 @@ namespace Demo.Pathfinding
         private void CreateMapFromScript(Coordinate size, bool diagonalMove = false)
         {
             _map.Initialize(size, diagonalMove);
-            _tileMap.Clear();
+            _baseTm.Clear();
             var tilesIterator = _map.TileIterator();
             while (tilesIterator.MoveNext())
             {
                 Tile tile = tilesIterator.Current;
                 if (tile == null) continue;
-                _tileMap.SetCell(tile.Coor, tile.Cost);
+                _baseTm.SetCell(tile.Coor, tile.Cost);
             }
         }
     }

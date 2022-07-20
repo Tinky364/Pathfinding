@@ -1,4 +1,5 @@
-﻿using Demo.Pathfinding;
+﻿using System.Collections.Generic;
+using Demo.Pathfinding;
 using Godot;
 using Pathfinding;
 
@@ -34,8 +35,11 @@ namespace Demo
             {
                 if (_selectedTile == null)
                 {
+                    _mapManager.ClearPath();
                     _selectedTile = tile;
                     GD.Print($"Start Tile: {tile}");
+                    List<Tile> tiles = _mapManager.AvailableTiles(_selectedTile, 3);
+                    _mapManager.DrawAvailableTiles(tiles);
                 }
                 else if (_selectedTile == tile)
                 {
@@ -44,6 +48,7 @@ namespace Demo
                 }
                 else
                 {
+                    _mapManager.ClearAvailableTiles();
                     if (_mapManager.AStar(out Path<Tile> path, _selectedTile, tile))
                     {
                         _mapManager.DrawPath(path);
