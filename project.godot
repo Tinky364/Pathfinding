@@ -15,7 +15,7 @@ run/main_scene="res://nodes/Demo1.tscn"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/Pathfinding/plugin.cfg" )
+enabled=PoolStringArray(  )
 
 [physics]
 
