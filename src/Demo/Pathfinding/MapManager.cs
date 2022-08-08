@@ -66,7 +66,7 @@ namespace Demo.Pathfinding
 
         public List<Tile> AvailableTiles(Tile startTile, float maxCost)
         {
-            return AvailableTs(_map, startTile, maxCost);
+            return AvailablePaths(_map, startTile, maxCost);
         }
 
         public void DrawPath(Path<Tile> path)

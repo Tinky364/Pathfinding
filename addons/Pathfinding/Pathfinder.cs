@@ -7,12 +7,11 @@ namespace Pathfinding
     {
         public enum Type { AStar, Dijkstra }
 
-        public List<T> AvailableTs<T>(IGraph<T> graph, T startPoint, float maxCost)
+        public List<T> AvailablePaths<T>(IGraph<T> graph, T startPoint, float maxCost)
             where T : IPoint
         {
-            List<T> ts = new List<T>();
+            List<T> availablePoints = new List<T>();
             PointRecord<T> startPointRecord = new PointRecord<T>(startPoint, 0);
-
             PathFindingList<T> openList = new PathFindingList<T>(startPointRecord);
             PathFindingList<T> closedList = new PathFindingList<T>();
 
@@ -48,8 +47,7 @@ namespace Pathfinding
                     else
                     {
                         endPointRecord = new PointRecord<T>(
-                            endPoint, startPoint.EstimateTotalCost(endPoint)
-                        );
+                            endPoint, startPoint.EstimateTotalCost(endPoint));
                     }
 
                     endPointRecord.CostSoFar = endPointCostSoFar;
@@ -63,7 +61,7 @@ namespace Pathfinding
                 if (currentPointRecord != startPointRecord && 
                     currentPointRecord.EstimatedTotalCost <= maxCost)
                 {
-                    ts.Add(currentPointRecord.Point);
+                    availablePoints.Add(currentPointRecord.Point);
                 }
                 
                 openList.Remove(currentPointRecord);
@@ -73,7 +71,7 @@ namespace Pathfinding
             openList.Free();
             closedList.Free();
             
-            return ts;
+            return availablePoints;
         }
         
         public bool AStar<T>(out Path<T> path, IGraph<T> graph, T startPoint, T goalPoint)
@@ -85,14 +83,14 @@ namespace Pathfinding
 
         public Path<T> AStar<T>(IGraph<T> graph, T startPoint, T goalPoint) where T : IPoint
         {
-            PointRecord<T> startPointRecord = new PointRecord<T>(
-                startPoint, startPoint.EstimateTotalCost(goalPoint)
-            );
+            if (ReferenceEquals(startPoint, goalPoint)) return null;
 
+            PointRecord<T> startPointRecord = new PointRecord<T>(
+                startPoint, startPoint.EstimateTotalCost(goalPoint));
             PathFindingList<T> openList = new PathFindingList<T>(startPointRecord);
             PathFindingList<T> closedList = new PathFindingList<T>();
-
             PointRecord<T> currentPointRecord = startPointRecord;
+            
             while (openList.Count > 0)
             {
                 currentPointRecord = openList.SmallestPointRecord;
@@ -127,8 +125,7 @@ namespace Pathfinding
                     else
                     {
                         endPointRecord = new PointRecord<T>(
-                            endPoint, endPoint.EstimateTotalCost(goalPoint)
-                        );
+                            endPoint, endPoint.EstimateTotalCost(goalPoint));
                     }
 
                     endPointRecord.CostSoFar = endPointCostSoFar;
@@ -167,12 +164,13 @@ namespace Pathfinding
 
         public Path<T> Dijkstra<T>(IGraph<T> graph, T startPoint, T goalPoint) where T : IPoint
         {
-            PointRecord<T> startPointRecord = new PointRecord<T>(startPoint);
+            if (ReferenceEquals(startPoint, goalPoint)) return null;
 
+            PointRecord<T> startPointRecord = new PointRecord<T>(startPoint);
             PathFindingList<T> openList = new PathFindingList<T>(startPointRecord);
             PathFindingList<T> closedList = new PathFindingList<T>();
-
             PointRecord<T> currentPointRecord = startPointRecord;
+            
             while (openList.Count > 0)
             {
                 currentPointRecord = openList.SmallestPointRecord;

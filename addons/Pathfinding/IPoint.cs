@@ -2,7 +2,7 @@
 {
     public interface IPoint
     {
-        string Name { get; }
+        string Key { get; }
 
         float EstimateTotalCost<T>(T goalPoint) where T : IPoint;
     }

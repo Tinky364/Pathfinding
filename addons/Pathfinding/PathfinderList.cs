@@ -199,12 +199,12 @@ namespace Pathfinding
             
             PointRecord<T> iterator = _head;
             StringBuilder sb = new StringBuilder(
-                $"({iterator.Point.Name} = {iterator.EstimatedTotalCost})"
+                $"({iterator.Point.Key} = {iterator.EstimatedTotalCost})"
             );
             iterator = iterator.Next;
             while (iterator != null)
             {
-                sb.Append($" - ({iterator.Point.Name} = {iterator.EstimatedTotalCost})");
+                sb.Append($" - ({iterator.Point.Key} = {iterator.EstimatedTotalCost})");
                 iterator = iterator.Next;
             }
             return sb.ToString();

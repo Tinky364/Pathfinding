@@ -40,8 +40,8 @@ namespace Demo.Pathfinding
 
         public List<Edge<Tile>>.Enumerator EdgeIterator(PointRecord<Tile> pointRecord)
         {
-            if (!_edges.TryGetValue(pointRecord.Point.Name, out List<Edge<Tile>> list))
-                GD.PushError($"Edges of the tile {pointRecord.Point.Name} does not exist.");
+            if (!_edges.TryGetValue(pointRecord.Point.Key, out List<Edge<Tile>> list))
+                GD.PushError($"Edges of the tile {pointRecord.Point.Key} does not exist.");
             return list?.GetEnumerator() ?? new List<Edge<Tile>>.Enumerator();
         }
 
@@ -55,7 +55,7 @@ namespace Demo.Pathfinding
                 for (int y = 0; y < size.Y; y++)
                 {
                     Tile tile = new Tile(new Coordinate(x, y), rng.RandiRange(1, 3));
-                    _tiles.Add(tile.Name, tile);
+                    _tiles.Add(tile.Key, tile);
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace Demo.Pathfinding
             foreach (var pair in mapData)
             {
                 Tile tile = new Tile(pair.Key, pair.Value);
-                _tiles.Add(tile.Name, tile);
+                _tiles.Add(tile.Key, tile);
             }
         }
 
@@ -84,7 +84,7 @@ namespace Demo.Pathfinding
                     if (TryGetTile(coor, out Tile neighbor))
                         edges.Add(new Edge<Tile>(tile, neighbor, Tile.CostOfMove(tile, neighbor)));
                 }
-                _edges.Add(tile.Name, edges);
+                _edges.Add(tile.Key, edges);
             }
         }
     }

@@ -32,10 +32,10 @@ namespace Pathfinding
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(
-                $"Path: Start = {_list[0].From.Name}, Goal = {_list[_list.Count - 1].To.Name} \n" +
-                $"{_list[0].From.Name} -> {_list[0].To.Name}"
+                $"Path: Start = {_list[0].From.Key}, Goal = {_list[_list.Count - 1].To.Key} \n" +
+                $"{_list[0].From.Key} -> {_list[0].To.Key}"
             );
-            for (int i = 1; i < _list.Count; i++) sb.Append($" -> {_list[i].To.Name}");
+            for (int i = 1; i < _list.Count; i++) sb.Append($" -> {_list[i].To.Key}");
             sb.Append("\n------------------------");
             return sb.ToString();
         }

@@ -6,21 +6,21 @@ namespace Demo.Pathfinding
 {
     public class Tile : Reference, IPoint
     {
-        public string Name { get; }
+        public string Key { get; }
         public int Cost { get; }
         public Coordinate Coor { get; }
 
         public Tile(Coordinate coor, int cost = 1)
         {
             Coor = coor;
-            Name = ToName(coor);
+            Key = ToName(coor);
             Cost = cost;
         }
 
         public float EstimateTotalCost<T>(T goalPoint) where T : IPoint =>
             goalPoint is Tile goalTile ? Distance(Coor, goalTile.Coor) : 0;
 
-        public override string ToString() => $"Tile({Name})";
+        public override string ToString() => $"Tile({Key})";
 
         public static string ToName(Coordinate coor) => $"{coor.X},{coor.Y}";
 
